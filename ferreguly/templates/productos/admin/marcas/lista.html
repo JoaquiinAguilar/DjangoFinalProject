@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}Administración de Marcas - Ferreguly{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Administración de Marcas</h1>
+    <a href="{% url 'marca_crear' %}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Nueva Marca
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-header bg-white">
+        <div class="row">
+            <div class="col-md-5">
+                <h5 class="mb-0">Nombre</h5>
+            </div>
+            <div class="col-md-3 text-center">
+                <h5 class="mb-0">Estado</h5>
+            </div>
+            <div class="col-md-4 text-end">
+                <h5 class="mb-0">Acciones</h5>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        {% if marcas %}
+            {% for marca in marcas %}
+                <div class="row py-3 px-3 border-bottom align-items-center">
+                    <div class="col-md-5">
+                        <strong>{{ marca.nombre }}</strong>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        {% if marca.activo %}
+                            <span class="badge bg-success">Activa</span>
+                        {% else %}
+                            <span class="badge bg-danger">Inactiva</span>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <div class="btn-group">
+                            <a href="{% url 'marca_editar' marca.id_marca %}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-edit"></i> Editar
+                            </a>
+                            <a href="{% url 'marca_eliminar' marca.id_marca %}" class="btn btn-sm btn-outline-danger">
+                                <i class="fas fa-trash-alt"></i> Eliminar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="p-4 text-center">
+                <p class="text-muted mb-0">No hay marcas registradas</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if is_paginated %}
+    <div class="pagination justify-content-center mt-4">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1">Primera</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Última</a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+{% endif %}
+
+<div class="mt-4">
+    <a href="{% url 'inicio' %}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left"></i> Volver al inicio
+    </a>
+</div>
+{% endblock %}

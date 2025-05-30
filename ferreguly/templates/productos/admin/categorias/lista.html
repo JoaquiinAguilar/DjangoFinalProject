@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Administración de Categorías - Ferreguly{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Administración de Categorías</h1>
+    <a href="{% url 'categoria_crear' %}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Nueva Categoría
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-header bg-white">
+        <div class="row">
+            <div class="col-md-4">
+                <h5 class="mb-0">Nombre</h5>
+            </div>
+            <div class="col-md-5">
+                <h5 class="mb-0">Descripción</h5>
+            </div>
+            <div class="col-md-1 text-center">
+                <h5 class="mb-0">Estado</h5>
+            </div>
+            <div class="col-md-2 text-end">
+                <h5 class="mb-0">Acciones</h5>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        {% if categorias %}
+            {% for categoria in categorias %}
+                <div class="row py-3 px-3 border-bottom align-items-center">
+                    <div class="col-md-4">
+                        <strong>{{ categoria.nombre }}</strong>
+                    </div>
+                    <div class="col-md-5">
+                        {{ categoria.descripcion|default:"Sin descripción"|truncatechars:100 }}
+                    </div>
+                    <div class="col-md-1 text-center">
+                        {% if categoria.activo %}
+                            <span class="badge bg-success">Activa</span>
+                        {% else %}
+                            <span class="badge bg-danger">Inactiva</span>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-2 text-end">
+                        <div class="btn-group">
+                            <a href="{% url 'categoria_editar' categoria.id_categoria %}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'categoria_eliminar' categoria.id_categoria %}" class="btn btn-sm btn-outline-danger">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="p-4 text-center">
+                <p class="text-muted mb-0">No hay categorías registradas</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="mt-4">
+    <a href="{% url 'inicio' %}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left"></i> Volver al inicio
+    </a>
+</div>
+{% endblock %}

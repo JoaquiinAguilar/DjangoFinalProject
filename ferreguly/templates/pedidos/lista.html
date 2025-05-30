@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block title %}Mis Pedidos - Ferreguly{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Mi Cuenta</h5>
+            </div>
+            <div class="list-group list-group-flush">
+                <a href="{% url 'perfil' %}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-user"></i> Información Personal
+                </a>
+                <a href="{% url 'direcciones_lista' %}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-map-marker-alt"></i> Mis Direcciones
+                </a>
+                <a href="{% url 'pedidos_lista' %}" class="list-group-item list-group-item-action active">
+                    <i class="fas fa-shopping-bag"></i> Mis Pedidos
+                </a>
+                <a href="{% url 'logout' %}" class="list-group-item list-group-item-action text-danger">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Mis Pedidos</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if pedidos %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Pedido #</th>
+                                    <th>Fecha</th>
+                                    <th>Total</th>
+                                    <th class="text-center">Estado</th>
+                                    <th class="text-end">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pedido in pedidos %}
+                                    <tr>
+                                        <td>{{ pedido.id_pedido }}</td>
+                                        <td>{{ pedido.fecha_pedido|date:"d/m/Y H:i" }}</td>
+                                        <td>${{ pedido.total }}</td>
+                                        <td class="text-center">
+                                            {% if pedido.estado == 'pendiente' %}
+                                                <span class="badge bg-warning text-dark">Pendiente</span>
+                                            {% elif pedido.estado == 'pagado' %}
+                                                <span class="badge bg-info">Pagado</span>
+                                            {% elif pedido.estado == 'enviado' %}
+                                                <span class="badge bg-primary">Enviado</span>
+                                            {% elif pedido.estado == 'entregado' %}
+                                                <span class="badge bg-success">Entregado</span>
+                                            {% elif pedido.estado == 'cancelado' %}
+                                                <span class="badge bg-danger">Cancelado</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-end">
+                                            <a href="{% url 'pedido_detalle' pedido.id_pedido %}" class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-eye"></i> Ver
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center p-4">
+                        <i class="fas fa-shopping-bag fa-3x text-muted mb-3"></i>
+                        <h5>No tienes pedidos realizados</h5>
+                        <p class="text-muted">Cuando realices un pedido, aparecerá aquí para que puedas darle seguimiento.</p>
+                        <a href="{% url 'catalogo' %}" class="btn btn-primary mt-2">
+                            <i class="fas fa-shopping-cart"></i> Ir a comprar
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if is_paginated %}
+    <div class="pagination justify-content-center mt-4">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1">Primera</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Última</a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+{% endif %}
+{% endblock %}

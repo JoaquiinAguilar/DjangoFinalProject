@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block title %}Ferreguly - Tu ferretería de confianza{% endblock %}
+
+{% block content %}
+<div class="jumbotron bg-light p-5 rounded">
+    <h1 class="display-4">Bienvenido a Ferreguly!</h1>
+    <p class="lead">Tu ferretería de confianza para todos tus proyectos de construcción, reparación y mejoras del hogar.</p>
+    <hr class="my-4">
+    
+</div>
+
+
+
+<!-- Productos  -->
+<div class="row mt-5">
+    <div class="col-12">
+        <h2 class="text-center mb-4">Nuestros Productos</h2>
+    </div>
+</div>
+
+<div class="row">
+    {% if productos_destacados %}
+        {% for producto in productos_destacados %}
+            <div class="col-md-4 col-lg-2 mb-4">
+                <div class="card h-100">
+                    {% if producto.imagen %}
+                        <img src="{{ producto.imagen.url }}" class="card-img-top" alt="{{ producto.nombre }}" style="height: 150px; object-fit: contain; padding: 10px;">
+                    {% else %}
+                        <div class="bg-light text-center py-4">
+                            <i class="fas fa-image fa-3x text-secondary"></i>
+                        </div>
+                    {% endif %}
+                    <div class="card-body text-center">
+                        <h6 class="card-title">{{ producto.nombre|truncatechars:25 }}</h6>
+                        <p class="card-text text-primary mb-0">${{ producto.precio }}</p>
+                        <small class="text-muted">{{ producto.id_categoria.nombre }}</small>
+                    </div>
+                    <div class="card-footer bg-white text-center">
+                        <a href="{% url 'producto_detalle' producto.id_producto %}" class="btn btn-sm btn-outline-primary">Ver detalles</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-md-12">
+            <div class="alert alert-info text-center">
+                No hay productos disponibles en este momento.
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<div class="row mt-5">
+    <div class="col-12">
+        <h2 class="text-center mb-4">Nuestras Categorías</h2>
+    </div>
+</div>
+
+<div class="row">
+    {% if categorias %}
+        {% for categoria in categorias %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        {% if forloop.counter == 1 %}
+                            <i class="fas fa-hammer fa-3x mb-3 text-primary"></i>
+                        {% elif forloop.counter == 2 %}
+                            <i class="fas fa-plug fa-3x mb-3 text-primary"></i>
+                        {% elif forloop.counter == 3 %}
+                            <i class="fas fa-faucet fa-3x mb-3 text-primary"></i>
+                        {% elif forloop.counter == 4 %}
+                            <i class="fas fa-tools fa-3x mb-3 text-primary"></i>
+                        {% elif forloop.counter == 5 %}
+                            <i class="fas fa-paint-roller fa-3x mb-3 text-primary"></i>
+                        {% else %}
+                            <i class="fas fa-toolbox fa-3x mb-3 text-primary"></i>
+                        {% endif %}
+                        <h5 class="card-title">{{ categoria.nombre }}</h5>
+                        <p class="card-text">{{ categoria.descripcion|default:"Encuentra los mejores productos de esta categoría para tus proyectos."|truncatechars:100 }}</p>
+                        <a href="{% url 'catalogo' %}?categoria={{ categoria.id_categoria }}" class="btn btn-outline-primary">Ver {{ categoria.nombre }}</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-md-12">
+            <div class="alert alert-info text-center">
+                No hay categorías disponibles en este momento.
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<div class="row mt-5">
+    <div class="col-12">
+        <h2 class="text-center mb-4">¿Por qué elegirnos?</h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-3 mb-4">
+        <div class="text-center">
+            <i class="fas fa-truck fa-3x mb-3 text-success"></i>
+            <h5>Envío Rápido</h5>
+            <p>Entregamos tus productos en tiempo récord para que no detengas tus proyectos.</p>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="text-center">
+            <i class="fas fa-medal fa-3x mb-3 text-success"></i>
+            <h5>Calidad Garantizada</h5>
+            <p>Trabajamos con las mejores marcas para ofrecerte productos de alta calidad.</p>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="text-center">
+            <i class="fas fa-headset fa-3x mb-3 text-success"></i>
+            <h5>Atención Personalizada</h5>
+            <p>Nuestro equipo está listo para asesorarte en tus proyectos.</p>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="text-center">
+            <i class="fas fa-undo fa-3x mb-3 text-success"></i>
+            <h5>Devoluciones Sencillas</h5>
+            <p>Si no estás satisfecho, te facilitamos el proceso de devolución.</p>
+        </div>
+    </div>
+</div>
+
+<p>Explora nuestro catálogo de productos de alta calidad para encontrar todo lo que necesitas.</p>
+    <a class="btn btn-primary btn-lg" href="{% url 'catalogo' %}" role="button">Ver Catálogo</a>
+{% endblock %}

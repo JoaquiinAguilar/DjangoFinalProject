@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Eliminar del Carrito - Ferreguly{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Eliminar del carrito</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle"></i> ¿Estás seguro de que deseas eliminar este producto del carrito?
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        {% if item.id_producto.imagen %}
+                            <img src="{{ item.id_producto.imagen.url }}" alt="{{ item.id_producto.nombre }}" class="img-fluid">
+                        {% else %}
+                            <div class="bg-light text-center p-5">
+                                <i class="fas fa-image fa-3x text-secondary"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-8">
+                        <h5>{{ item.id_producto.nombre }}</h5>
+                        <p class="text-muted small">
+                            <span class="me-2">Categoría: {{ item.id_producto.id_categoria.nombre }}</span>
+                            <span>Marca: {{ item.id_producto.id_marca.nombre }}</span>
+                        </p>
+                        <p><strong>Precio:</strong> ${{ item.id_producto.precio }}</p>
+                        <p><strong>Cantidad:</strong> {{ item.cantidad }}</p>
+                        <p><strong>Subtotal:</strong> ${{ item.subtotal }}</p>
+                    </div>
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'carrito_lista' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i> Volver al carrito
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash-alt"></i> Confirmar eliminación
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

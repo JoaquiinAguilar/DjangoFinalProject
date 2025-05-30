@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ producto.nombre }} - Ferreguly{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mt-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'inicio' %}">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'catalogo' %}">Catálogo</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'catalogo' %}?categoria={{ producto.id_categoria.id_categoria }}">{{ producto.id_categoria.nombre }}</a></li>
+        <li class="breadcrumb-item active">{{ producto.nombre }}</li>
+    </ol>
+</nav>
+
+<div class="row mt-4">
+    <!-- Imagen del producto -->
+    <div class="col-md-5 mb-4">
+        <div class="card">
+            {% if producto.imagen %}
+                <img src="{{ producto.imagen.url }}" class="card-img-top" alt="{{ producto.nombre }}" style="height: 400px; object-fit: contain;">
+            {% else %}
+                <div class="bg-light text-center py-5" style="height: 400px;">
+                    <i class="fas fa-image fa-8x text-secondary"></i>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Detalles del producto -->
+    <div class="col-md-7 mb-4">
+        <h1 class="mb-3">{{ producto.nombre }}</h1>
+        
+        <div class="mb-3">
+            <span class="badge bg-primary me-2">{{ producto.id_categoria.nombre }}</span>
+            <span class="badge bg-secondary">{{ producto.id_marca.nombre }}</span>
+        </div>
+        
+        <p class="mb-4">{{ producto.descripcion }}</p>
+        
+        <div class="d-flex align-items-center mb-4">
+            <h3 class="text-primary mb-0 me-3">${{ producto.precio }}</h3>
+            <span class="{% if producto.stock > 0 %}text-success{% else %}text-danger{% endif %}">
+                {% if producto.stock > 0 %}
+                    <i class="fas fa-check-circle"></i> En stock ({{ producto.stock }} disponibles)
+                {% else %}
+                    <i class="fas fa-times-circle"></i> Producto agotado
+                {% endif %}
+            </span>
+        </div>
+        
+        {% if producto.stock > 0 %}
+            <form method="post" action="{% url 'carrito_agregar' producto.id_producto %}" class="mb-4">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <label class="input-group-text" for="cantidad">Cantidad</label>
+                            <input type="number" name="cantidad" id="cantidad" class="form-control" value="1" min="1" max="{{ producto.stock }}">
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <input type="hidden" name="id_producto" value="{{ producto.id_producto }}">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-cart-plus"></i> Agregar al carrito
+                        </button>
+                    </div>
+                </div>
+            </form>
+        {% else %}
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle"></i> Lo sentimos, este producto está agotado temporalmente.
+            </div>
+        {% endif %}
+        
+        <!-- Características adicionales -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">Características</h5>
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item d-flex justify-content-between">
+                    <span>Categoría:</span>
+                    <span>{{ producto.id_categoria.nombre }}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between">
+                    <span>Marca:</span>
+                    <span>{{ producto.id_marca.nombre }}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between">
+                    <span>Disponibilidad:</span>
+                    <span class="{% if producto.stock > 0 %}text-success{% else %}text-danger{% endif %}">
+                        {% if producto.stock > 0 %}
+                            En stock
+                        {% else %}
+                            Agotado
+                        {% endif %}
+                    </span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between">
+                    <span>Código de producto:</span>
+                    <span>FG-{{ producto.id_producto }}</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Productos relacionados -->
+<div class="row mt-5">
+    <div class="col-12">
+        <h3 class="mb-4">Productos relacionados</h3>
+    </div>
+</div>
+
+<div class="row">
+    {% for prod in producto.id_categoria.productos.all|slice:":4" %}
+        {% if prod.id_producto != producto.id_producto and prod.activo %}
+            <div class="col-md-3 mb-4">
+                <div class="card h-100">
+                    {% if prod.imagen %}
+                        <img src="{{ prod.imagen.url }}" class="card-img-top" alt="{{ prod.nombre }}" style="height: 150px; object-fit: contain;">
+                    {% else %}
+                        <div class="bg-light text-center py-4">
+                            <i class="fas fa-image fa-3x text-secondary"></i>
+                        </div>
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ prod.nombre|truncatechars:30 }}</h5>
+                        <h6 class="text-primary">${{ prod.precio }}</h6>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <a href="{% url 'producto_detalle' prod.id_producto %}" class="btn btn-outline-primary btn-sm w-100">
+                            Ver producto
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+</div>
+{% endblock %}

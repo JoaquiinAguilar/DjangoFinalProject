@@ -1,0 +1,214 @@
+{% extends 'base.html' %}
+
+{% block title %}Pedido #{{ pedido.id_pedido }} - Administración - Ferreguly{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mt-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'inicio' %}">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'pedidos_admin_lista' %}">Administración de Pedidos</a></li>
+        <li class="breadcrumb-item active">Pedido #{{ pedido.id_pedido }}</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-8">
+        <h1 class="mb-4">Detalles del Pedido #{{ pedido.id_pedido }}</h1>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{% url 'pedidos_admin_lista' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Volver a la lista
+        </a>
+        <a href="{% url 'pedido_actualizar_estado' pedido.id_pedido %}" class="btn btn-primary">
+            <i class="fas fa-sync-alt"></i> Actualizar Estado
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Información del pedido -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Información del pedido</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Número de pedido:</strong> #{{ pedido.id_pedido }}</p>
+                <p><strong>Cliente:</strong> {{ pedido.id_usuario.get_full_name }}</p>
+                <p><strong>Email:</strong> {{ pedido.id_usuario.email }}</p>
+                <p><strong>Teléfono:</strong> {{ pedido.id_usuario.telefono|default:"No especificado" }}</p>
+                <p><strong>Fecha:</strong> {{ pedido.fecha_pedido|date:"d/m/Y H:i" }}</p>
+                <p><strong>Estado:</strong> 
+                    {% if pedido.estado == 'pendiente' %}
+                        <span class="badge bg-warning text-dark">Pendiente</span>
+                    {% elif pedido.estado == 'pagado' %}
+                        <span class="badge bg-info">Pagado</span>
+                    {% elif pedido.estado == 'enviado' %}
+                        <span class="badge bg-primary">Enviado</span>
+                    {% elif pedido.estado == 'entregado' %}
+                        <span class="badge bg-success">Entregado</span>
+                    {% elif pedido.estado == 'cancelado' %}
+                        <span class="badge bg-danger">Cancelado</span>
+                    {% endif %}
+                </p>
+                <p><strong>Subtotal:</strong> ${{ pedido.subtotal }}</p>
+                <p><strong>Total:</strong> ${{ pedido.total }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Dirección de envío -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Dirección de envío</h5>
+            </div>
+            <div class="card-body">
+                {% if pedido.id_direccion_envio %}
+                    <p><strong>Nombre:</strong> {{ pedido.id_direccion_envio.nombre }} {{ pedido.id_direccion_envio.apellidos }}</p>
+                    <p><strong>Dirección:</strong> {{ pedido.id_direccion_envio.calle }} {{ pedido.id_direccion_envio.numero_ext }}
+                        {% if pedido.id_direccion_envio.numero_int %}, Int. {{ pedido.id_direccion_envio.numero_int }}{% endif %}
+                    </p>
+                    <p><strong>Colonia:</strong> {{ pedido.id_direccion_envio.colonia }}</p>
+                    <p><strong>Ciudad:</strong> {{ pedido.id_direccion_envio.ciudad }}, {{ pedido.id_direccion_envio.estado }}</p>
+                    <p><strong>C.P.:</strong> {{ pedido.id_direccion_envio.codigo_postal }}</p>
+                    <p><strong>Teléfono:</strong> {{ pedido.id_direccion_envio.telefono }}</p>
+                    <p><strong>Email:</strong> {{ pedido.id_direccion_envio.email }}</p>
+                {% else %}
+                    <p class="text-muted">No se especificó dirección de envío</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Detalles de los productos -->
+<div class="card mb-4">
+    <div class="card-header bg-white">
+        <h5 class="mb-0">Productos</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th class="text-center">Precio unitario</th>
+                        <th class="text-center">Cantidad</th>
+                        <th class="text-end">Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for detalle in detalles %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    {% if detalle.id_producto.imagen %}
+                                        <img src="{{ detalle.id_producto.imagen.url }}" alt="{{ detalle.id_producto.nombre }}" style="width: 50px; height: 50px; object-fit: contain;" class="me-3">
+                                    {% else %}
+                                        <div class="bg-light text-center me-3" style="width: 50px; height: 50px; line-height: 50px;">
+                                            <i class="fas fa-image text-secondary"></i>
+                                        </div>
+                                    {% endif %}
+                                    <div>
+                                        <h6 class="mb-1">{{ detalle.id_producto.nombre }}</h6>
+                                        <small class="text-muted">{{ detalle.id_producto.id_categoria.nombre }} | {{ detalle.id_producto.id_marca.nombre }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-center">${{ detalle.precio_unitario }}</td>
+                            <td class="text-center">{{ detalle.cantidad }}</td>
+                            <td class="text-end">${{ detalle.subtotal }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot class="table-group-divider">
+                    <tr>
+                        <td colspan="3" class="text-end"><strong>Subtotal:</strong></td>
+                        <td class="text-end">${{ pedido.subtotal }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                        <td class="text-end"><strong>${{ pedido.total }}</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Historial y seguimiento del pedido -->
+<div class="card mb-4">
+    <div class="card-header bg-white">
+        <h5 class="mb-0">Estado del pedido</h5>
+    </div>
+    <div class="card-body">
+        <div class="position-relative m-4">
+            <div class="progress" style="height: 3px;">
+                <div class="progress-bar bg-success" role="progressbar" 
+                    style="width: 
+                        {% if pedido.estado == 'pendiente' %}20%
+                        {% elif pedido.estado == 'pagado' %}40%
+                        {% elif pedido.estado == 'enviado' %}60%
+                        {% elif pedido.estado == 'entregado' %}100%
+                        {% elif pedido.estado == 'cancelado' %}100%
+                        {% endif %};" 
+                    aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">
+                </div>
+            </div>
+            <div class="position-absolute top-0 translate-middle" style="left: 0%">
+                <div class="rounded-circle 
+                    {% if pedido.estado != 'cancelado' %}bg-success{% else %}bg-danger{% endif %}" 
+                    style="width: 20px; height: 20px;">
+                </div>
+                <div class="mt-2">Pedido realizado</div>
+            </div>
+            <div class="position-absolute top-0 translate-middle" style="left: 25%">
+                <div class="rounded-circle 
+                    {% if pedido.estado == 'pendiente' %}bg-secondary
+                    {% elif pedido.estado == 'cancelado' %}bg-danger
+                    {% else %}bg-success{% endif %}" 
+                    style="width: 20px; height: 20px;">
+                </div>
+                <div class="mt-2">Pago confirmado</div>
+            </div>
+            <div class="position-absolute top-0 translate-middle" style="left: 50%">
+                <div class="rounded-circle 
+                    {% if pedido.estado == 'pendiente' or pedido.estado == 'pagado' %}bg-secondary
+                    {% elif pedido.estado == 'cancelado' %}bg-danger
+                    {% else %}bg-success{% endif %}" 
+                    style="width: 20px; height: 20px;">
+                </div>
+                <div class="mt-2">En camino</div>
+            </div>
+            <div class="position-absolute top-0 translate-middle" style="left: 75%">
+                <div class="rounded-circle 
+                    {% if pedido.estado == 'entregado' %}bg-success
+                    {% elif pedido.estado == 'cancelado' %}bg-danger
+                    {% else %}bg-secondary{% endif %}" 
+                    style="width: 20px; height: 20px;">
+                </div>
+                <div class="mt-2">Entregado</div>
+            </div>
+            <div class="position-absolute top-0 translate-middle" style="left: 100%">
+                {% if pedido.estado == 'cancelado' %}
+                    <div class="rounded-circle bg-danger" style="width: 20px; height: 20px;"></div>
+                    <div class="mt-2">Cancelado</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Botones de acción -->
+<div class="row">
+    <div class="col-12 text-end">
+        <a href="{% url 'pedidos_admin_lista' %}" class="btn btn-outline-secondary me-2">
+            <i class="fas fa-arrow-left"></i> Volver a la lista
+        </a>
+        <a href="{% url 'pedido_actualizar_estado' pedido.id_pedido %}" class="btn btn-primary">
+            <i class="fas fa-sync-alt"></i> Actualizar Estado
+        </a>
+    </div>
+</div>
+{% endblock %}

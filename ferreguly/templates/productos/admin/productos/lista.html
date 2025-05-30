@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+
+{% block title %}Administración de Productos - Ferreguly{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Administración de Productos</h1>
+    <a href="{% url 'producto_crear' %}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Nuevo Producto
+    </a>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header bg-white">
+        <form method="get" class="row">
+            <div class="col-md-3 mb-2">
+                <label for="categoria" class="form-label">Categoría</label>
+                <select name="categoria" id="categoria" class="form-select">
+                    <option value="">Todas las categorías</option>
+                    {% for categoria in categorias %}
+                        <option value="{{ categoria.id_categoria }}" {% if request.GET.categoria == categoria.id_categoria|stringformat:"i" %}selected{% endif %}>
+                            {{ categoria.nombre }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3 mb-2">
+                <label for="marca" class="form-label">Marca</label>
+                <select name="marca" id="marca" class="form-select">
+                    <option value="">Todas las marcas</option>
+                    {% for marca in marcas %}
+                        <option value="{{ marca.id_marca }}" {% if request.GET.marca == marca.id_marca|stringformat:"i" %}selected{% endif %}>
+                            {{ marca.nombre }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3 mb-2">
+                <label for="busqueda" class="form-label">Búsqueda</label>
+                <input type="text" name="busqueda" id="busqueda" class="form-control" placeholder="Buscar..." value="{{ request.GET.busqueda|default:'' }}">
+            </div>
+            <div class="col-md-3 mb-2 d-flex align-items-end">
+                <div class="d-grid gap-2 w-100">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-filter"></i> Filtrar
+                    </button>
+                    <a href="{% url 'productos_lista' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-undo"></i> Limpiar
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-white">
+        <div class="row">
+            <div class="col-md-4">
+                <h5 class="mb-0">Producto</h5>
+            </div>
+            <div class="col-md-2">
+                <h5 class="mb-0">Categoría</h5>
+            </div>
+            <div class="col-md-2">
+                <h5 class="mb-0">Marca</h5>
+            </div>
+            <div class="col-md-1 text-center">
+                <h5 class="mb-0">Precio</h5>
+            </div>
+            <div class="col-md-1 text-center">
+                <h5 class="mb-0">Stock</h5>
+            </div>
+            <div class="col-md-2 text-end">
+                <h5 class="mb-0">Acciones</h5>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        {% if productos %}
+            {% for producto in productos %}
+                <div class="row py-3 px-3 border-bottom align-items-center">
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-center">
+                            {% if producto.imagen %}
+                                <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" style="width: 50px; height: 50px; object-fit: contain;" class="me-3">
+                            {% else %}
+                                <div class="bg-light text-center me-3" style="width: 50px; height: 50px; line-height: 50px;">
+                                    <i class="fas fa-image text-secondary"></i>
+                                </div>
+                            {% endif %}
+                            <div>
+                                <strong>{{ producto.nombre }}</strong>
+                                <div class="small text-muted">{{ producto.descripcion|truncatechars:50 }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        {{ producto.id_categoria.nombre }}
+                    </div>
+                    <div class="col-md-2">
+                        {{ producto.id_marca.nombre }}
+                    </div>
+                    <div class="col-md-1 text-center">
+                        ${{ producto.precio }}
+                    </div>
+                    <div class="col-md-1 text-center">
+                        {% if producto.stock > 0 %}
+                            <span class="badge bg-success">{{ producto.stock }}</span>
+                        {% else %}
+                            <span class="badge bg-danger">0</span>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-2 text-end">
+                        <div class="btn-group">
+                            <a href="{% url 'producto_editar' producto.id_producto %}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'producto_eliminar' producto.id_producto %}" class="btn btn-sm btn-outline-danger">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="p-4 text-center">
+                <p class="text-muted mb-0">No hay productos que coincidan con los criterios de búsqueda</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if is_paginated %}
+    <div class="pagination justify-content-center mt-4">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% if request.GET.categoria %}&categoria={{ request.GET.categoria }}{% endif %}{% if request.GET.marca %}&marca={{ request.GET.marca }}{% endif %}{% if request.GET.busqueda %}&busqueda={{ request.GET.busqueda }}{% endif %}">Primera</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.categoria %}&categoria={{ request.GET.categoria }}{% endif %}{% if request.GET.marca %}&marca={{ request.GET.marca }}{% endif %}{% if request.GET.busqueda %}&busqueda={{ request.GET.busqueda }}{% endif %}">Anterior</a>
+                </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% if request.GET.categoria %}&categoria={{ request.GET.categoria }}{% endif %}{% if request.GET.marca %}&marca={{ request.GET.marca }}{% endif %}{% if request.GET.busqueda %}&busqueda={{ request.GET.busqueda }}{% endif %}">{{ num }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.categoria %}&categoria={{ request.GET.categoria }}{% endif %}{% if request.GET.marca %}&marca={{ request.GET.marca }}{% endif %}{% if request.GET.busqueda %}&busqueda={{ request.GET.busqueda }}{% endif %}">Siguiente</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.categoria %}&categoria={{ request.GET.categoria }}{% endif %}{% if request.GET.marca %}&marca={{ request.GET.marca }}{% endif %}{% if request.GET.busqueda %}&busqueda={{ request.GET.busqueda }}{% endif %}">Última</a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+{% endif %}
+
+<div class="mt-4">
+    <a href="{% url 'inicio' %}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left"></i> Volver al inicio
+    </a>
+</div>
+{% endblock %}

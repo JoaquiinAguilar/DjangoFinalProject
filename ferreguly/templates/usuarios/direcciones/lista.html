@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}Mis Direcciones - Ferreguly{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Mi Cuenta</h5>
+            </div>
+            <div class="list-group list-group-flush">
+                <a href="{% url 'perfil' %}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-user"></i> Información Personal
+                </a>
+                <a href="{% url 'direcciones_lista' %}" class="list-group-item list-group-item-action active">
+                    <i class="fas fa-map-marker-alt"></i> Mis Direcciones
+                </a>
+                <a href="{% url 'pedidos_lista' %}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-shopping-bag"></i> Mis Pedidos
+                </a>
+                <a href="{% url 'logout' %}" class="list-group-item list-group-item-action text-danger">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Mis Direcciones</h5>
+                <a href="{% url 'direccion_crear' %}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-plus"></i> Agregar Dirección
+                </a>
+            </div>
+            <div class="card-body">
+                {% if direcciones %}
+                    <div class="row">
+                        {% for direccion in direcciones %}
+                            <div class="col-md-6 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h6 class="card-title">{{ direccion.nombre }} {{ direccion.apellidos }}</h6>
+                                        <p class="card-text">
+                                            {{ direccion.calle }} {{ direccion.numero_ext }}
+                                            {% if direccion.numero_int %}, Int. {{ direccion.numero_int }}{% endif %}<br>
+                                            Col. {{ direccion.colonia }}<br>
+                                            {{ direccion.ciudad }}, {{ direccion.estado }}<br>
+                                            C.P. {{ direccion.codigo_postal }}<br>
+                                            Tel: {{ direccion.telefono }}<br>
+                                            Email: {{ direccion.email }}
+                                        </p>
+                                    </div>
+                                    <div class="card-footer bg-white">
+                                        <div class="btn-group w-100">
+                                            <a href="{% url 'direccion_editar' direccion.id_direccion %}" class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-edit"></i> Editar
+                                            </a>
+                                            <a href="{% url 'direccion_eliminar' direccion.id_direccion %}" class="btn btn-outline-danger btn-sm">
+                                                <i class="fas fa-trash-alt"></i> Eliminar
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> No tienes direcciones registradas. 
+                        <a href="{% url 'direccion_crear' %}" class="alert-link">Agrega una dirección</a> para poder realizar pedidos.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

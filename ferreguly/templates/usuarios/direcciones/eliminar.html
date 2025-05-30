@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Eliminar Dirección - Ferreguly{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Confirmar Eliminación</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle"></i> ¿Estás seguro de que deseas eliminar esta dirección?
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h6 class="card-title">{{ object.nombre }} {{ object.apellidos }}</h6>
+                        <p class="card-text">
+                            {{ object.calle }} {{ object.numero_ext }}
+                            {% if object.numero_int %}, Int. {{ object.numero_int }}{% endif %}<br>
+                            Col. {{ object.colonia }}<br>
+                            {{ object.ciudad }}, {{ object.estado }}<br>
+                            C.P. {{ object.codigo_postal }}<br>
+                            Tel: {{ object.telefono }}<br>
+                            Email: {{ object.email }}
+                        </p>
+                    </div>
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'direcciones_lista' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash-alt"></i> Confirmar Eliminación
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
