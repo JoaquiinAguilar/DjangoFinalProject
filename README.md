@@ -20,6 +20,9 @@ Ferreguly es un proyecto de Django que implementa una tienda online para una fer
 ## Instalación
 
 1. Clona el repositorio o descarga los archivos
+```
+git clone https://github.com/JoaquiinAguilar/DjangoFinalProject.git
+```
 
 2. Crea un entorno virtual:
 ```
@@ -36,26 +39,33 @@ python -m venv venv
    source venv/bin/activate
    ```
 
-4. Instala las dependencias:
+4. Entrar a la carpeta raiz:
+```
+cd ferreguly
+```
+
+5. Instala las dependencias:
 ```
 pip install -r requirements.txt
 ```
 
-5. Realiza las migraciones:
+6. Realiza las migraciones:
 ```
 python manage.py makemigrations
 python manage.py migrate
 ```
 
-6. Crea un superusuario:
+7. Crea un superusuario:
 ```
 python manage.py createsuperuser
 ```
 
-7. Inicia el servidor:
+8. Inicia el servidor:
 ```
 python manage.py runserver
 ```
+
+9. Enjoy!
 
 ## Estructura del Proyecto
 
